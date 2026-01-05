@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pdfplumber
+qdrant-client
+numpy
+langchain-text-splitters
+python-multipart
+aiohttp
