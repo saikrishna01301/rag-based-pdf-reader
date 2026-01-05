@@ -9,6 +9,7 @@ services:
       - 8080:8080
     volumes:
       - ../models:/models
+      - ./backend/embeddings/app:/app/app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 600s
@@ -66,6 +67,8 @@ services:
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
       - LOCALAI_URL=http://localai:8080/v1
+    volumes:
+      - ./backend/pdfqa/app:/app/app
     depends_on:
       embeddings:
         condition: service_healthy
