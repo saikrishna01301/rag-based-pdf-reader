@@ -8,6 +8,7 @@ import {
 export interface PDF {
   id: string;
   name: string;
+  chunks?: number;
 }
 
 export interface Message {
