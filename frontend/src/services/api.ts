@@ -1,4 +1,4 @@
-const PDF_QA_API_URL = "http://localhost:9000";
+const PDF_QA_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000";
 
 export const uploadPdf = async (file: File) => {
   const formData = new FormData();
