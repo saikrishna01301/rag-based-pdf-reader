@@ -61,8 +61,9 @@ export const useChat = () => {
         throw new Error('Failed to read response stream');
       }
 
-      let assistantMessage: Message = { role: 'assistant', content: '', sources: [] };
-      setChatHistory((prev) => [...prev, assistantMessage]);
+      let currentAssistantMessageContent = '';
+      let currentAssistantMessageSources: { chunk_id: number; pdf_id: string }[] | undefined = undefined;
+      let assistantMessageIndex: number | null = null; // To track the index of the assistant message in chatHistory
 
       let buffer = '';
       const decoder = new TextDecoder();
@@ -73,14 +74,20 @@ export const useChat = () => {
             try {
               const parsed = JSON.parse(buffer);
               if (parsed.type === 'metadata') {
-                assistantMessage.sources = parsed.sources;
+                currentAssistantMessageSources = parsed.sources;
               } else if (parsed.type === 'chunk') {
-                assistantMessage.content += parsed.content;
-                setChatHistory((prev) => {
-                  const newHistory = [...prev];
-                  newHistory[newHistory.length - 1] = { ...assistantMessage };
-                  return newHistory;
-                });
+                currentAssistantMessageContent += parsed.content;
+                if (assistantMessageIndex !== null) {
+                  setChatHistory((prev) => {
+                    const newHistory = [...prev];
+                    newHistory[assistantMessageIndex] = {
+                      role: 'assistant',
+                      content: currentAssistantMessageContent,
+                      sources: currentAssistantMessageSources,
+                    };
+                    return newHistory;
+                  });
+                }
               }
             } catch (e) {
               console.error('Failed to parse remaining stream buffer:', buffer, e);
@@ -99,14 +106,32 @@ export const useChat = () => {
           try {
             const parsed = JSON.parse(line);
             if (parsed.type === 'metadata') {
-              assistantMessage.sources = parsed.sources;
+              currentAssistantMessageSources = parsed.sources;
             } else if (parsed.type === 'chunk') {
-              assistantMessage.content += parsed.content;
-              setChatHistory((prev) => {
-                const newHistory = [...prev];
-                newHistory[newHistory.length - 1] = { ...assistantMessage };
-                return newHistory;
-              });
+              currentAssistantMessageContent += parsed.content;
+              if (assistantMessageIndex === null) {
+                // First chunk arrived, add assistant message to history
+                setChatHistory((prev) => {
+                  const newHistory = [...prev, {
+                    role: 'assistant',
+                    content: currentAssistantMessageContent,
+                    sources: currentAssistantMessageSources,
+                  }];
+                  assistantMessageIndex = newHistory.length - 1;
+                  return newHistory;
+                });
+              } else {
+                // Subsequent chunks, update existing message
+                setChatHistory((prev) => {
+                  const newHistory = [...prev];
+                  newHistory[assistantMessageIndex] = {
+                    role: 'assistant',
+                    content: currentAssistantMessageContent,
+                    sources: currentAssistantMessageSources,
+                  };
+                  return newHistory;
+                });
+              }
             }
           } catch (e) {
             console.error('Failed to parse stream chunk:', line, e);
