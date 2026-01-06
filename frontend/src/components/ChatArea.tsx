@@ -36,7 +36,7 @@ const ChatArea = ({
   const getModeText = () => {
     if (activePdfId) {
       const pdf = pdfs.find((p) => p.id === activePdfId);
-      return `PDF: ${pdf.name.substring(0, 15)}...`;
+      return pdf ? `PDF: ${pdf.name.substring(0, 15)}...` : 'General AI';
     } else if (pdfs.length > 0) {
       return `All PDFs (${pdfs.length})`;
     } else {

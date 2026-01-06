@@ -15,7 +15,7 @@
 
 ## 📸 Demo
 
-> **Note:** Add a demo GIF or screenshot here showing: PDF upload → question input → AI response
+> **Note:** live demo area
 
 ![Demo Preview](./docs/demo.gif)
 _Upload any PDF and ask questions - get AI-powered answers with source citations_
@@ -287,6 +287,7 @@ See **[DEPLOYMENT.md](DEPLOYMENT.md)** for complete step-by-step instructions.
 ### Backend (Local Development Only)
 
 The full backend stack (FastAPI, LocalAI, Qdrant, Vector embeddings) runs locally for:
+
 - **Privacy**: All data processing stays on your machine - no external API calls
 - **Cost-Effective**: Avoid expensive cloud GPU/compute costs ($50-100/month)
 - **Full Control**: Complete control over models, data, and processing
