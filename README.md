@@ -271,20 +271,31 @@ pdf-reader/
 
 ## 🚀 Deployment
 
-### Frontend (Vercel)
+This project uses a **privacy-first architecture** with LocalAI, which requires significant compute resources (4-8GB RAM, GPU recommended). For cost-effective deployment:
+
+### Frontend Deployment (Vercel) - UI Preview
+
+Deploy the Next.js frontend to showcase the interface and architecture:
 
 ```bash
 cd frontend
 vercel deploy
 ```
 
-### Backend Options
+See **[DEPLOYMENT.md](DEPLOYMENT.md)** for complete step-by-step instructions.
 
-- **Docker**: Deploy containers to AWS ECS, Google Cloud Run, or DigitalOcean
-- **Serverless**: Deploy FastAPI services to Render, Railway, or Fly.io
-- **Self-hosted**: Run docker-compose on any VPS
+### Backend (Local Development Only)
 
-> **Note:** For production, pre-download models to avoid long startup times. Consider using a persistent volume for the `models/` directory.
+The full backend stack (FastAPI, LocalAI, Qdrant, Vector embeddings) runs locally for:
+- **Privacy**: All data processing stays on your machine - no external API calls
+- **Cost-Effective**: Avoid expensive cloud GPU/compute costs ($50-100/month)
+- **Full Control**: Complete control over models, data, and processing
+
+### 📹 Video Demo
+
+The complete functionality is demonstrated via video walkthrough. See **[VIDEO_DEMO_GUIDE.md](VIDEO_DEMO_GUIDE.md)** for recording instructions.
+
+> **Cloud Deployment Note:** For production cloud deployment, consider replacing LocalAI with OpenAI/Anthropic/Hugging Face APIs. LocalAI excels for local development and privacy-sensitive applications but requires expensive GPU infrastructure for cloud hosting.
 
 ---
 
