@@ -1,0 +1,59 @@
+# This file specifies files that are intentionally not uploaded to
+# Google Cloud Run. This prevents large/unnecessary files from being
+# uploaded, speeding up deployments.
+
+# Git
+.git
+.gitignore
+*.md
+README.md
+LICENSE
+
+# Node
+node_modules/
+frontend/
+npm-debug.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Models (large files)
+models/
+*.bin
+*.gguf
+*.pt
+*.pth
+
+# Docker
+.dockerignore
+docker-compose*.yml
+Dockerfile*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Database
+qdrant_storage/
+*.db
+*.sqlite
+
+# Deployment guides (not needed in container)
+*_DEPLOYMENT.md
+RAILWAY_DEPLOYMENT.md
+GCP_DEPLOYMENT.md
+VERCEL_DEPLOYMENT.md
