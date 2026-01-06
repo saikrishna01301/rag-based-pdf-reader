@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
+import {
+  uploadPdf,
+  askQuestion,
+  listPdfs,
+} from '../services/api';
 
 export interface PDF {
   id: string;
   name: string;
-  chunks: number;
 }
 
 export interface Message {
@@ -18,15 +22,27 @@ export const useChat = () => {
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
 
+  const fetchPdfs = async () => {
+    try {
+      const pdfsData = await listPdfs();
+      setPdfs(pdfsData.pdfs);
+    } catch (error) {
+      console.error('Failed to fetch PDFs:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPdfs();
+  }, []);
+
   const uploadFiles = async (files: File[]) => {
-    for (const file of files) {
-      const newPdf: PDF = {
-        id: 'pdf_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-        name: file.name,
-        chunks: Math.floor(Math.random() * 50) + 10,
-      };
-      setPdfs((prevPdfs) => [...prevPdfs, newPdf]);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      for (const file of files) {
+        await uploadPdf(file);
+      }
+      await fetchPdfs();
+    } catch (error) {
+      console.error('Failed to upload files:', error);
     }
   };
 
@@ -36,18 +52,76 @@ export const useChat = () => {
     setChatHistory((prev) => [...prev, { role: 'user', content: message }]);
     setIsTyping(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const sanitizedChatHistory = chatHistory.map(({ role, content }) => ({ role, content }));
+      const response = await askQuestion(message, activePdfId, sanitizedChatHistory);
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('Failed to read response stream');
+      }
 
-    const response: Message = {
-      role: 'assistant',
-      content: activePdfId
-        ? `Based on the PDF "${pdfs.find((p) => p.id === activePdfId)?.name}", here's the answer: This is a mock response. In production, this would stream from your /ask endpoint.`
-        : `This is a general AI response to: "${message}". Since no PDF is selected, I'm responding with general knowledge.`,
-      sources: activePdfId ? [{ chunk_id: 0, pdf_id: activePdfId }] : null,
-    };
+      let assistantMessage: Message = { role: 'assistant', content: '', sources: [] };
+      setChatHistory((prev) => [...prev, assistantMessage]);
 
-    setIsTyping(false);
-    setChatHistory((prev) => [...prev, response]);
+      let buffer = '';
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          if (buffer.trim()) {
+            try {
+              const parsed = JSON.parse(buffer);
+              if (parsed.type === 'metadata') {
+                assistantMessage.sources = parsed.sources;
+              } else if (parsed.type === 'chunk') {
+                assistantMessage.content += parsed.content;
+                setChatHistory((prev) => {
+                  const newHistory = [...prev];
+                  newHistory[newHistory.length - 1] = { ...assistantMessage };
+                  return newHistory;
+                });
+              }
+            } catch (e) {
+              console.error('Failed to parse remaining stream buffer:', buffer, e);
+            }
+          }
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // Keep the last (potentially incomplete) line in the buffer
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+
+          try {
+            const parsed = JSON.parse(line);
+            if (parsed.type === 'metadata') {
+              assistantMessage.sources = parsed.sources;
+            } else if (parsed.type === 'chunk') {
+              assistantMessage.content += parsed.content;
+              setChatHistory((prev) => {
+                const newHistory = [...prev];
+                newHistory[newHistory.length - 1] = { ...assistantMessage };
+                return newHistory;
+              });
+            }
+          } catch (e) {
+            console.error('Failed to parse stream chunk:', line, e);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+      };
+      setChatHistory((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const selectPdf = (pdfId: string) => {

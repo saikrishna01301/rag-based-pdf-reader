@@ -91,28 +91,21 @@ const ChatArea = ({
                 className={styles.messageContent}
               >
                 <p>{msg.content}</p>
-                {msg.sources && (
+                {msg.sources && msg.sources.length > 0 && msg.sources[0] && (
                   <div className={styles.sourceTag}>
                     Source: Chunk {msg.sources[0].chunk_id}
+                  </div>
+                )}
+                {msg.role === 'assistant' && index === chatHistory.length - 1 && isTyping && msg.content.length === 0 && (
+                  <div className={styles.typingIndicator}>
+                      <div className={styles.typingDot}></div>
+                      <div className={styles.typingDot}></div>
+                      <div className={styles.typingDot}></div>
                   </div>
                 )}
               </div>
             </div>
           ))
-        )}
-        {isTyping && (
-          <div className={`${styles.message} ${styles.assistant}`}>
-            <div className={styles.messageAvatar}>
-              AI
-            </div>
-            <div className={styles.messageContent}>
-                <div className={styles.typingIndicator}>
-                    <div className={styles.typingDot}></div>
-                    <div className={styles.typingDot}></div>
-                    <div className={styles.typingDot}></div>
-                </div>
-            </div>
-          </div>
         )}
       </div>
 

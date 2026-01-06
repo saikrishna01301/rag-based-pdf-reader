@@ -90,7 +90,7 @@ async def query_llm(prompt: str, context: str):
         "temperature": 0.3,
         "stop": ["<|endoftext|>", "<|end|>"],
         "stream": True,
-        "max_tokens": 1024,
+        "max_tokens": 400,
     }
 
     async with aiohttp.ClientSession() as session:
@@ -176,7 +176,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     # getting sample embedding for vector size
     sample_embedding = await get_embedding(chunks[0])
     vector_size = len(sample_embedding)
-    collection_name = f"pdf_{uuid.uuid4()}"
+    collection_name = f"{file.filename.split('.')[0]}_{uuid.uuid4()}"
     setup_collection(collection_name, vector_size)
     batch_size = 100
 
@@ -247,9 +247,7 @@ async def ask_question(request: QuestionRequest):
     question_embedding = await get_embedding(request.question)
 
     results = qdrant_client.query_points(
-        collection_name=request.pdf_id,
-        query=question_embedding,
-        limit=2
+        collection_name=request.pdf_id, query=question_embedding, limit=2
     ).points
 
     # Extract context for LLM (internal use only, NOT sent to frontend)
