@@ -20,8 +20,10 @@ AI-powered PDF question answering system built with Next.js, FastAPI, and LocalA
 ### Backend
 - FastAPI (Python)
 - Qdrant (Vector Database)
-- LocalAI (AI Model Inference)
+- LocalAI (AI Model Inference - Phi-3.5-mini-instruct)
 - pdfplumber (PDF Processing)
+- langchain-text-splitters (Token-based text splitting)
+- aiohttp (Async HTTP client)
 
 ## 📦 Local Setup
 
@@ -58,11 +60,42 @@ docker-compose up --build
 
 ## 🏗️ Architecture
 
+```mermaid
+graph TB
+    User[👤 User] --> Frontend[Frontend<br/>Next.js:3000]
+    Frontend --> PDFQA[PDF QA Service<br/>FastAPI:9000]
+
+    PDFQA --> Embeddings[Embeddings Service<br/>FastAPI:8080]
+    PDFQA --> LocalAI[LocalAI<br/>Phi-3.5:8081]
+    PDFQA --> Qdrant[Qdrant Vector DB<br/>:6333]
+
+    subgraph "PDF Upload Flow"
+        U1[Upload PDF] --> U2[Extract Text]
+        U2 --> U3[Token Split<br/>600/100 overlap]
+        U3 --> U4[Batch Embed<br/>100 chunks/batch]
+        U4 --> U5[Store in Qdrant<br/>COSINE distance]
+    end
+
+    subgraph "Question Answering Flow"
+        Q1[User Question] --> Q2[Generate Embedding]
+        Q2 --> Q3[Vector Search<br/>Top 2 chunks]
+        Q3 --> Q4[Retrieve Context]
+        Q4 --> Q5[Query Phi-3.5<br/>with Context]
+        Q5 --> Q6[Stream Response<br/>NDJSON]
+    end
+
+    style Frontend fill:#61dafb
+    style PDFQA fill:#009688
+    style Embeddings fill:#4caf50
+    style LocalAI fill:#ff9800
+    style Qdrant fill:#dc395f
 ```
-Frontend (Next.js) → PDF QA Service → Embeddings Service
-                                    → LocalAI
-                                    → Qdrant
-```
+
+**RAG Flow:**
+1. PDF Upload → Text Extraction → Token Splitting (600 tokens, 100 overlap)
+2. Batch Embedding (100 chunks/batch) → Store in Qdrant
+3. Question → Embedding → Vector Search (COSINE similarity, top 2)
+4. Retrieved Context + Question → Phi-3.5 Model → Streaming Response
 
 ## 📁 Project Structure
 
@@ -74,6 +107,53 @@ pdf-reader/
 │   └── pdfqa/         # PDF processing service
 └── docker-compose.yml
 ```
+
+## 📡 API Endpoints
+
+### PDF QA Service (Port 9000)
+
+**POST /upload**
+- Upload PDF file
+- Extracts text, splits into chunks, generates embeddings
+- Stores in Qdrant vector database
+- Returns: `{pdf_id, message, stats: {chunks}}`
+
+**POST /ask**
+- Ask questions about uploaded PDFs
+- Request: `{question: str, pdf_id: str (optional), chat_history: []}`
+- Response: NDJSON streaming format
+  ```json
+  {"type": "metadata", "pdf_id": "pdf_xxx", "sources": [{"chunk_id": 0}]}
+  {"type": "chunk", "content": "partial answer..."}
+  {"type": "chunk", "content": "more text..."}
+  ```
+
+**GET /pdfs**
+- List all uploaded PDF collections
+- Returns: `{pdfs: [{id, name}]}`
+
+**GET /pdfs/{pdf_id}/chunks/{chunk_id}**
+- Retrieve specific chunk text for citation
+- Returns: `{chunk_id, text, metadata}`
+
+**GET /health**
+- Health check endpoint
+- Returns: `{status: "healthy"}`
+
+### Embeddings Service (Port 8080)
+
+**POST /embed**
+- Generate embedding for single text
+- Request: `{text: str}`
+- Returns: `[float]` (384-dim vector)
+
+**POST /embed_batch**
+- Generate embeddings for multiple texts
+- Request: `{texts: [str]}`
+- Returns: `[[float]]`
+
+**GET /health**
+- Health check endpoint
 
 ## 🚀 Deployment
 
