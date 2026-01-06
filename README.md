@@ -18,7 +18,7 @@
 > **Note:** Add a demo GIF or screenshot here showing: PDF upload → question input → AI response
 
 ![Demo Preview](./docs/demo.gif)
-*Upload any PDF and ask questions - get AI-powered answers with source citations*
+_Upload any PDF and ask questions - get AI-powered answers with source citations_
 
 ---
 
@@ -52,12 +52,14 @@ Built to demonstrate **end-to-end AI/ML engineering capabilities**, from PDF pro
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - Next.js 16.1
 - React 19.2
 - TypeScript 5
 - Tailwind CSS
 
 ### Backend
+
 - FastAPI (Python)
 - Qdrant (Vector Database)
 - LocalAI (AI Model Inference - Phi-3.5-mini-instruct)
@@ -68,32 +70,38 @@ Built to demonstrate **end-to-end AI/ML engineering capabilities**, from PDF pro
 ## 📦 Local Setup
 
 ### Prerequisites
+
 - Docker & Docker Compose
 - 8GB RAM minimum
 
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone https://github.com/YOUR-USERNAME/pdf-reader.git
 cd pdf-reader
 ```
 
 2. Set up AI models directory
+
 ```bash
 mkdir -p models
 ```
 
 > **Note:** Models are large files (not included in repo). They will be auto-downloaded on first run, or you can manually download from:
+>
 > - Embedding models: Auto-downloaded via langchain-huggingface
 > - LocalAI models: Place your model files in `models/` folder
 
 3. Start services
+
 ```bash
 docker-compose up --build
 ```
 
 3. Access the application
+
 - Frontend: http://localhost:3000
 - Embeddings API: http://localhost:8080/docs
 - PDF QA API: http://localhost:9000/docs
@@ -101,6 +109,7 @@ docker-compose up --build
 - Qdrant Dashboard: http://localhost:6333/dashboard
 
 > **⏱️ First Startup Note:** Initial startup may take 10-30 minutes as models are downloaded (2-4GB). Check Docker logs to monitor progress:
+>
 > ```bash
 > docker-compose logs -f embeddings localai
 > ```
@@ -110,23 +119,27 @@ docker-compose up --build
 The following environment variables are configured in `docker-compose.yml`:
 
 **PDF QA Service:**
+
 - `EMBEDDINGS_SERVICE_URL`: URL for embeddings service (default: `http://embeddings:8080`)
 - `QDRANT_HOST`: Qdrant vector database host (default: `qdrant`)
 - `QDRANT_PORT`: Qdrant port (default: `6333`)
 - `LOCALAI_URL`: LocalAI API endpoint (default: `http://localai:8080/v1`)
 
 **LocalAI Service:**
+
 - `MODELS_PATH`: Directory for AI models (default: `/models`)
 - `LOG_LEVEL`: Logging level (default: `INFO`)
 
 ### Development Setup (Without Docker)
 
 **Prerequisites:**
+
 - Python 3.10+
 - Node.js 20+
 - Qdrant running locally or via Docker
 
 **Backend Services:**
+
 ```bash
 # Embeddings Service
 cd backend/embeddings
@@ -143,6 +156,7 @@ uvicorn app.main:app --reload --port 9000
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm install
@@ -183,6 +197,7 @@ graph TB
 ```
 
 **RAG Flow:**
+
 1. PDF Upload → Text Extraction → Token Splitting (600 tokens, 100 overlap)
 2. Batch Embedding (100 chunks/batch) → Store in Qdrant
 3. Question → Embedding → Vector Search (COSINE similarity, top 2)
@@ -204,12 +219,14 @@ pdf-reader/
 ### PDF QA Service (Port 9000)
 
 **POST /upload**
+
 - Upload PDF file
 - Extracts text, splits into chunks, generates embeddings
 - Stores in Qdrant vector database
 - Returns: `{pdf_id, message, stats: {chunks}}`
 
 **POST /ask**
+
 - Ask questions about uploaded PDFs
 - Request: `{question: str, pdf_id: str (optional), chat_history: []}`
 - Response: NDJSON streaming format
@@ -220,41 +237,49 @@ pdf-reader/
   ```
 
 **GET /pdfs**
+
 - List all uploaded PDF collections
 - Returns: `{pdfs: [{id, name}]}`
 
 **GET /pdfs/{pdf_id}/chunks/{chunk_id}**
+
 - Retrieve specific chunk text for citation
 - Returns: `{chunk_id, text, metadata}`
 
 **GET /health**
+
 - Health check endpoint
 - Returns: `{status: "healthy"}`
 
 ### Embeddings Service (Port 8080)
 
 **POST /embed**
+
 - Generate embedding for single text
 - Request: `{text: str}`
 - Returns: `[float]` (384-dim vector)
 
 **POST /embed_batch**
+
 - Generate embeddings for multiple texts
 - Request: `{texts: [str]}`
 - Returns: `[[float]]`
 
 **GET /health**
+
 - Health check endpoint
 
 ## 🚀 Deployment
 
 ### Frontend (Vercel)
+
 ```bash
 cd frontend
 vercel deploy
 ```
 
 ### Backend Options
+
 - **Docker**: Deploy containers to AWS ECS, Google Cloud Run, or DigitalOcean
 - **Serverless**: Deploy FastAPI services to Render, Railway, or Fly.io
 - **Self-hosted**: Run docker-compose on any VPS
@@ -266,41 +291,53 @@ vercel deploy
 ## 🐛 Troubleshooting
 
 ### Long Startup Times
+
 **Problem:** Services take 10-30 minutes to start
 **Solution:** Models are being downloaded (2-4GB). Monitor progress:
+
 ```bash
 docker-compose logs -f embeddings localai
 ```
+
 For faster subsequent starts, models are cached in the `models/` directory.
 
 ### Out of Memory Errors
+
 **Problem:** Docker containers crash with OOM
 **Solution:** Increase Docker memory allocation to at least 8GB in Docker Desktop settings.
 
 ### PDF Upload Fails
+
 **Problem:** Large PDFs fail to upload
 **Solution:**
+
 - Check PDF size (recommended < 50MB)
 - Ensure sufficient disk space for text extraction
 - Check Docker logs: `docker-compose logs pdfqa`
 
 ### Qdrant Connection Errors
+
 **Problem:** "Cannot connect to Qdrant"
 **Solution:**
+
 - Ensure Qdrant service is healthy: `docker-compose ps`
 - Wait for all health checks to pass (may take 2-5 minutes)
 - Restart services: `docker-compose restart pdfqa`
 
 ### LocalAI Model Not Found
+
 **Problem:** "Model not found" or "Failed to load model"
 **Solution:**
+
 - Ensure `models/` directory exists and has proper permissions
 - Check LocalAI logs: `docker-compose logs localai`
 - Manually download Phi-3.5 model if auto-download fails
 
 ### Slow Inference Times
+
 **Problem:** Questions take too long to answer
 **Solution:**
+
 - LocalAI runs on CPU by default (5-15 seconds per response)
 - For GPU acceleration, update docker-compose.yml with CUDA support
 - Reduce context chunks from 2 to 1 in the code for faster responses
@@ -341,6 +378,7 @@ For faster subsequent starts, models are cached in the `models/` directory.
 ## 🤝 Contributing
 
 Contributions are welcome! Areas for improvement:
+
 - GPU acceleration support
 - OCR for scanned PDFs
 - User authentication system
@@ -353,15 +391,13 @@ Contributions are welcome! Areas for improvement:
 
 ## 📞 Contact
 
-**Built by:** [Your Name]
-**GitHub:** [github.com/yourusername](https://github.com/yourusername)
-**LinkedIn:** [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-**Email:** your.email@example.com
-**Portfolio:** [yourportfolio.com](https://yourportfolio.com)
+**Built by:** Sai Krishna
+**LinkedIn:** [https://www.linkedin.com/in/saikrishna01301/]
+**Portfolio:** I will add later
 
-💼 **Open to opportunities** in Full-Stack Development, AI/ML Engineering, and Cloud Architecture
+## 💼 **Open to opportunities**
 
----
+In Full-Stack Development, AI Engineering.
 
 ## 📄 License
 
