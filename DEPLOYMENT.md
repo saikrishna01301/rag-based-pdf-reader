@@ -9,6 +9,7 @@ This project showcases a **privacy-first AI architecture** with LocalAI running 
 **Frontend (UI):** Vercel - Live demo of interface
 **Backend (AI):** Local only - Shown in video demo
 **Why:** LocalAI requires significant resources (4-8GB RAM, GPU acceleration) which are cost-prohibitive for cloud hosting. This approach demonstrates:
+
 - Production-ready frontend deployment
 - Cost-effective architecture decisions
 - Privacy-first design (data stays local)
@@ -20,15 +21,18 @@ This project showcases a **privacy-first AI architecture** with LocalAI running 
 ### Quick Deploy (5 minutes)
 
 1. **Go to Vercel**
+
    - Visit: [vercel.com/new](https://vercel.com/new)
    - Sign in with GitHub
 
 2. **Import Repository**
+
    - Click "Add New Project"
    - Select: `saikrishna01301/rag-based-pdf-reader`
    - Click "Import"
 
 3. **Configure Build Settings**
+
    ```
    Framework Preset: Next.js
    Root Directory: frontend
@@ -38,6 +42,7 @@ This project showcases a **privacy-first AI architecture** with LocalAI running 
    ```
 
 4. **Environment Variables** (Optional)
+
    - Name: `NEXT_PUBLIC_API_URL`
    - Value: `http://localhost:9000`
    - Note: This won't work in production, but shows the UI
@@ -56,12 +61,14 @@ See [VIDEO_DEMO_GUIDE.md](VIDEO_DEMO_GUIDE.md) for detailed instructions.
 ### Quick Steps:
 
 1. **Prepare Local Environment**
+
    ```bash
    docker-compose up
    # Wait for all services to start (~10-30 min first time)
    ```
 
 2. **Record Demo (2-3 minutes)**
+
    - Open http://localhost:3000
    - Upload a PDF
    - Ask 2-3 questions
@@ -76,6 +83,7 @@ See [VIDEO_DEMO_GUIDE.md](VIDEO_DEMO_GUIDE.md) for detailed instructions.
 ## ✅ What Gets Deployed
 
 ### Vercel (Live):
+
 - ✅ Next.js frontend UI
 - ✅ Responsive design
 - ✅ Upload interface
@@ -83,6 +91,7 @@ See [VIDEO_DEMO_GUIDE.md](VIDEO_DEMO_GUIDE.md) for detailed instructions.
 - ❌ Backend API (not connected)
 
 ### Video Demo Shows:
+
 - ✅ Full working application
 - ✅ PDF upload and processing
 - ✅ AI-powered Q&A
@@ -101,6 +110,7 @@ Add your links:
 ```
 
 Add a note:
+
 ```markdown
 > **Note:** Frontend deployed to Vercel shows the UI. Full AI functionality
 > (LocalAI with Phi-3.5) runs locally for privacy and cost efficiency.
@@ -112,12 +122,14 @@ Add a note:
 ## 🎯 Why This Approach?
 
 **Professional Reasons:**
+
 1. **Cost-Effective** - No monthly cloud costs
 2. **Shows Decision-Making** - Understanding production tradeoffs
 3. **Privacy-First** - Demonstrates security awareness
 4. **Full-Stack Skills** - Frontend deployment + backend architecture
 
 **What Recruiters See:**
+
 - Live deployed frontend (production skills)
 - Well-documented architecture (technical writing)
 - Video demo (presentation skills)

@@ -78,9 +78,10 @@ export const useChat = () => {
               } else if (parsed.type === 'chunk') {
                 currentAssistantMessageContent += parsed.content;
                 if (assistantMessageIndex !== null) {
+                  const index = assistantMessageIndex; // TypeScript narrowing
                   setChatHistory((prev) => {
                     const newHistory = [...prev];
-                    newHistory[assistantMessageIndex] = {
+                    newHistory[index] = {
                       role: 'assistant',
                       content: currentAssistantMessageContent,
                       sources: currentAssistantMessageSources,
@@ -112,20 +113,22 @@ export const useChat = () => {
               if (assistantMessageIndex === null) {
                 // First chunk arrived, add assistant message to history
                 setChatHistory((prev) => {
-                  const newHistory = [...prev, {
-                    role: 'assistant',
+                  const newMessage: Message = {
+                    role: 'assistant' as const,
                     content: currentAssistantMessageContent,
                     sources: currentAssistantMessageSources,
-                  }];
+                  };
+                  const newHistory = [...prev, newMessage];
                   assistantMessageIndex = newHistory.length - 1;
                   return newHistory;
                 });
               } else {
                 // Subsequent chunks, update existing message
+                const index = assistantMessageIndex;
                 setChatHistory((prev) => {
                   const newHistory = [...prev];
-                  newHistory[assistantMessageIndex] = {
-                    role: 'assistant',
+                  newHistory[index] = {
+                    role: 'assistant' as const,
                     content: currentAssistantMessageContent,
                     sources: currentAssistantMessageSources,
                   };
