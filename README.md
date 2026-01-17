@@ -9,7 +9,7 @@
 [![LocalAI](https://img.shields.io/badge/LocalAI-Phi--3.5-ff9800)](https://localai.io/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-[🚀 Live Demo](#) | [📹 Video Demo](#) | [📧 Contact](#-contact)
+[🚀 Live Demo](https://rag-based-pdf-reader.vercel.app/) | [📹 Video Demo](#) | [📧 Contact](#-contact)
 
 ---
 
@@ -79,8 +79,8 @@ Built to demonstrate **end-to-end AI/ML engineering capabilities**, from PDF pro
 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/pdf-reader.git
-cd pdf-reader
+git clone https://github.com/saikrishna01301/rag-based-pdf-reader.git
+cd rag-based-pdf-reader
 ```
 
 2. Set up AI models directory
@@ -403,9 +403,9 @@ Contributions are welcome! Areas for improvement:
 
 ## 📞 Contact
 
-**Built by:** Sai Krishna
-**LinkedIn:** [https://www.linkedin.com/in/saikrishna01301/]
-**Portfolio:** I will add later
+**Built by:** Saikrishna Kokkula
+**LinkedIn:** [linkedin.com/in/saikrishna01301](https://www.linkedin.com/in/saikrishna01301/)
+**GitHub:** [github.com/saikrishna01301](https://github.com/saikrishna01301)
 
 ## 💼 **Open to opportunities**
 
