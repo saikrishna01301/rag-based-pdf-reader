@@ -15,7 +15,7 @@ export default function Home() {
           <strong>Demo Notice:</strong> This is a UI demo only. The backend uses local AI and is not deployed.
           To try the full app, clone the repo and set it up locally.{' '}
           <a
-            href="https://github.com/saikrishna488/pdf-reader"
+            href="https://github.com/saikrishna01301/rag-based-pdf-reader"
             target="_blank"
             rel="noopener noreferrer"
           >
