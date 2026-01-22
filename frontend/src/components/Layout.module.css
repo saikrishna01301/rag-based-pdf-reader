@@ -29,3 +29,42 @@
         grid-template-columns: 1fr;
     }
 }
+
+.demoBanner {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.demoBanner p {
+    margin: 0;
+    color: #92400e;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.demoBanner strong {
+    color: #78350f;
+}
+
+.demoBanner a {
+    color: #d97706;
+    font-weight: 600;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.demoBanner a:hover {
+    color: #b45309;
+}
+
+.warningIcon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
